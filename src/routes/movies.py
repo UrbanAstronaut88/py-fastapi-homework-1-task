@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db, MovieModel
-from schemas.movies import MovieListResponseSchema, MovieDetailResponseSchema
+from src.database import get_db, MovieModel
+from src.schemas.movies import MovieListResponseSchema, MovieDetailResponseSchema
 
 router = APIRouter()
 
@@ -32,15 +32,11 @@ async def get_movies(
     movies = result.scalars().all()
 
     base_url = "/theater/movies/"
-    prev_page = (
-        f"{base_url}?page={page - 1}&per_page={per_page}" if page > 1 else None
-    )
-    next_page = (
-        f"{base_url}?page={page + 1}&per_page={per_page}" if page < total_pages else None
-    )
+    prev_page = f"{base_url}?page={max(page - 1, 1)}&per_page={per_page}"
+    next_page = f"{base_url}?page={page + 1}&per_page={per_page}"
 
     return MovieListResponseSchema(
-        movies=movies,
+        movies=[MovieDetailResponseSchema.model_validate(m) for m in movies],
         prev_page=prev_page,
         next_page=next_page,
         total_pages=total_pages,
