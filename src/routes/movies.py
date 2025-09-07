@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db, MovieModel
@@ -13,7 +13,7 @@ async def get_movies(
         per_page: int = Query(10, ge=1, le=20),
         db: AsyncSession = Depends(get_db),
 ):
-    # total amount movies
+    # total amount movies !
     total_items = await db.execute(select(func.count(MovieModel.id)))
     total_items = total_items.scalar_one()
 
@@ -24,7 +24,7 @@ async def get_movies(
     if page > total_pages:
         raise HTTPException(status_code=404, detail="No movies found.")
 
-    # selection of films with pagination
+    # selection of films with pagination !
     offset = (page - 1) * per_page
     result = await db.execute(
         select(MovieModel).offset(offset).limit(per_page)
@@ -47,8 +47,6 @@ async def get_movies(
         total_items=total_items,
     )
 
-
-from fastapi import Path
 
 @router.get("/movies/{movie_id}/", response_model=MovieDetailResponseSchema)
 async def get_movie_by_id(
