@@ -23,7 +23,7 @@ class MovieDetailResponseSchema(BaseModel):
 
 class MovieListResponseSchema(BaseModel):
     movies: list[MovieDetailResponseSchema]
-    prev_page: str
-    next_page: str
+    prev_page: Optional[str]
+    next_page: Optional[str]
     total_pages: int
     total_items: int
